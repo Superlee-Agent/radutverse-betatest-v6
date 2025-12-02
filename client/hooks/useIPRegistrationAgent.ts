@@ -465,43 +465,6 @@ export function useIPRegistrationAgent() {
             txHash: result?.txHash || result?.transactionHash,
             result,
           });
-
-          // If we have a tx hash but no IP ID, poll for confirmation
-          if (result?.txHash && !result?.ipId) {
-            console.log("Polling for transaction confirmation...", result.txHash);
-            const maxAttempts = 60; // 5 minutes with 5 second intervals
-            let attempts = 0;
-            let confirmedResult = result;
-
-            while (attempts < maxAttempts) {
-              try {
-                const receipt = await story.getTransactionReceipt({
-                  hash: result.txHash as `0x${string}`,
-                });
-
-                if (receipt?.blockNumber) {
-                  console.log("✅ Transaction confirmed at block:", receipt.blockNumber);
-                  confirmedResult = {
-                    ...result,
-                    ipId: result?.ipId || receipt?.logs?.[0]?.topics?.[1],
-                  };
-                  break;
-                }
-              } catch (e) {
-                console.log("Still waiting for confirmation...", {
-                  attempt: attempts + 1,
-                  maxAttempts,
-                });
-              }
-
-              attempts++;
-              if (attempts < maxAttempts) {
-                await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
-              }
-            }
-
-            result = confirmedResult;
-          }
         } catch (txError: any) {
           console.error("❌ Mint and register transaction failed:", {
             message: txError?.message,
