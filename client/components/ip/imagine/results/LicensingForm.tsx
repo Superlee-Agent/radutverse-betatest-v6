@@ -156,12 +156,31 @@ const LicensingFormComponent = (
 
       if (ethProvider) {
         try {
+          // Ensure wallet is connected and has accounts
+          try {
+            const accounts = await ethProvider.request({
+              method: 'eth_accounts'
+            });
+
+            if (!accounts || accounts.length === 0) {
+              // Request account access if not connected
+              await ethProvider.request({
+                method: 'eth_requestAccounts'
+              });
+            }
+          } catch (accountError: any) {
+            console.error(`Failed to connect wallet: ${accountError.message}`);
+            throw accountError;
+          }
+
           const walletClient = createWalletClient({
             transport: custom(ethProvider),
           });
           const [a] = await walletClient.getAddresses();
           if (a) addr = a;
-        } catch {}
+        } catch (walletError: any) {
+          console.warn("Failed to get wallet address:", walletError);
+        }
       }
 
       if (!addr) {
