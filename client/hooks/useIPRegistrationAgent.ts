@@ -485,15 +485,28 @@ export function useIPRegistrationAgent() {
       } catch (error: any) {
         const errorMsg =
           error?.message || error?.data?.message || String(error);
+
+        // Provide user-friendly error messages
+        let userFriendlyMsg = errorMsg;
+        if (errorMsg.includes('rejected by the user')) {
+          userFriendlyMsg = '❌ You rejected the transaction. Please try again if you want to proceed.';
+        } else if (errorMsg.includes('insufficient funds')) {
+          userFriendlyMsg = '❌ Insufficient funds for gas fees. Please add more IP tokens.';
+        } else if (errorMsg.includes('network')) {
+          userFriendlyMsg = '❌ Network connection error. Please check your connection and try again.';
+        } else if (errorMsg.includes('CallerNotAuthorizedToMint')) {
+          userFriendlyMsg = '❌ Your wallet is not authorized to mint on this contract. Please check with the admin.';
+        }
+
         console.error("❌ Registration failed:", {
           message: errorMsg,
           error,
           stack: error?.stack,
         });
-        setRegisterState({ status: "error", progress: 0, error: errorMsg });
+        setRegisterState({ status: "error", progress: 0, error: userFriendlyMsg });
         return {
           success: false,
-          error: errorMsg,
+          error: userFriendlyMsg,
         } as const;
       }
     },
