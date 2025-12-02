@@ -332,7 +332,6 @@ const LicensingFormComponent = (
             licenseDocument: {
               uri: OFFCHAIN_LICENSE_TERMS_URI,
             },
-            txOptions: { waitForTransaction: true },
           });
 
         childIpId = derivativeResponse.ipId as Address;
@@ -381,7 +380,6 @@ const LicensingFormComponent = (
           currencyTokens: [WIP_TOKEN_ADDRESS],
           childIpIds: childIpId ? [childIpId] : [],
           royaltyPolicies: [],
-          txOptions: { waitForTransaction: true },
         });
 
         console.log(

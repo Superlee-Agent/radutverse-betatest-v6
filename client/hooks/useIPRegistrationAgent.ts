@@ -458,14 +458,15 @@ export function useIPRegistrationAgent() {
               nftMetadataHash: ipMetadataHash as any,
             },
             allowDuplicates: true,
-            txOptions: { waitForTransaction: true },
           });
 
-          console.log("✅ Mint and register transaction completed", {
+          console.log("✅ Mint and register transaction submitted", {
             ipId: result?.ipId,
             txHash: result?.txHash || result?.transactionHash,
             result,
           });
+
+          setRegisterState((p) => ({ ...p, progress: 90 }));
         } catch (txError: any) {
           console.error("❌ Mint and register transaction failed:", {
             message: txError?.message,
