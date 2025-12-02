@@ -380,7 +380,6 @@ const LicensingFormComponent = (
           currencyTokens: [WIP_TOKEN_ADDRESS],
           childIpIds: childIpId ? [childIpId] : [],
           royaltyPolicies: [],
-          txOptions: { waitForTransaction: true },
         });
 
         console.log(
