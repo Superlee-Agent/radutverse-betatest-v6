@@ -156,12 +156,31 @@ const LicensingFormComponent = (
 
       if (ethProvider) {
         try {
+          // Ensure wallet is connected and has accounts
+          try {
+            const accounts = await ethProvider.request({
+              method: "eth_accounts",
+            });
+
+            if (!accounts || accounts.length === 0) {
+              // Request account access if not connected
+              await ethProvider.request({
+                method: "eth_requestAccounts",
+              });
+            }
+          } catch (accountError: any) {
+            console.error(`Failed to connect wallet: ${accountError.message}`);
+            throw accountError;
+          }
+
           const walletClient = createWalletClient({
             transport: custom(ethProvider),
           });
           const [a] = await walletClient.getAddresses();
           if (a) addr = a;
-        } catch {}
+        } catch (walletError: any) {
+          console.warn("Failed to get wallet address:", walletError);
+        }
       }
 
       if (!addr) {
@@ -320,13 +339,27 @@ const LicensingFormComponent = (
         console.log("✅ Derivative IP asset registered:", childIpId);
         console.log("📋 Metadata URIs:", { ipMetadataUri, nftMetadataUri });
       } catch (registerError: any) {
-        console.error(
-          "❌ Register derivative error:",
-          registerError?.message || registerError,
-        );
-        throw new Error(
-          `Failed to register derivative IP: ${registerError?.message || String(registerError)}`,
-        );
+        const errorMsg = registerError?.message || String(registerError);
+        console.error("❌ Register derivative error:", errorMsg);
+
+        // Check if user rejected the transaction
+        if (
+          registerError?.code === 4001 ||
+          errorMsg.includes("User rejected")
+        ) {
+          throw new Error("Transaction was rejected by the user");
+        }
+        // Check for other common wallet errors
+        if (errorMsg.includes("insufficient funds")) {
+          throw new Error("Insufficient funds for gas and transaction");
+        }
+        if (errorMsg.includes("CallerNotAuthorizedToMint")) {
+          throw new Error(
+            "Your wallet is not authorized to mint on this contract",
+          );
+        }
+
+        throw new Error(`Failed to register derivative IP: ${errorMsg}`);
       }
 
       // ========================================
@@ -380,7 +413,26 @@ const LicensingFormComponent = (
       }
     } catch (error: any) {
       const errorMsg = error?.message || error?.data?.message || String(error);
-      setRegisterError(errorMsg);
+
+      // Provide user-friendly error messages
+      let userFriendlyMsg = errorMsg;
+      if (errorMsg.includes("rejected by the user")) {
+        userFriendlyMsg =
+          "❌ You rejected the transaction. Please try again if you want to proceed.";
+      } else if (errorMsg.includes("insufficient funds")) {
+        userFriendlyMsg =
+          "❌ Insufficient funds for gas fees. Please add more IP tokens.";
+      } else if (errorMsg.includes("network")) {
+        userFriendlyMsg =
+          "❌ Network connection error. Please check your connection and try again.";
+      } else if (errorMsg.includes("CallerNotAuthorizedToMint")) {
+        userFriendlyMsg =
+          "❌ Your wallet is not authorized to mint on this contract. Please check with the admin.";
+      } else if (errorMsg.includes("Failed to register")) {
+        userFriendlyMsg = `❌ Registration failed. Please try again. (${errorMsg.substring(0, 50)}...)`;
+      }
+
+      setRegisterError(userFriendlyMsg);
       console.error("❌ Full registration error:", {
         message: errorMsg,
         error,
