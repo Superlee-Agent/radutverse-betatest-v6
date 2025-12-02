@@ -458,7 +458,11 @@ export function useIPRegistrationAgent() {
               nftMetadataHash: ipMetadataHash as any,
             },
             allowDuplicates: true,
-            txOptions: { waitForTransaction: true },
+            txOptions: {
+              waitForTransaction: true,
+              confirmations: 1,
+              timeout: 300_000, // 5 minutes for multicall operations
+            },
           });
 
           console.log("✅ Mint and register transaction completed", {
