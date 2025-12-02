@@ -413,7 +413,22 @@ const LicensingFormComponent = (
       }
     } catch (error: any) {
       const errorMsg = error?.message || error?.data?.message || String(error);
-      setRegisterError(errorMsg);
+
+      // Provide user-friendly error messages
+      let userFriendlyMsg = errorMsg;
+      if (errorMsg.includes('rejected by the user')) {
+        userFriendlyMsg = '❌ You rejected the transaction. Please try again if you want to proceed.';
+      } else if (errorMsg.includes('insufficient funds')) {
+        userFriendlyMsg = '❌ Insufficient funds for gas fees. Please add more IP tokens.';
+      } else if (errorMsg.includes('network')) {
+        userFriendlyMsg = '❌ Network connection error. Please check your connection and try again.';
+      } else if (errorMsg.includes('CallerNotAuthorizedToMint')) {
+        userFriendlyMsg = '❌ Your wallet is not authorized to mint on this contract. Please check with the admin.';
+      } else if (errorMsg.includes('Failed to register')) {
+        userFriendlyMsg = `❌ Registration failed. Please try again. (${errorMsg.substring(0, 50)}...)`;
+      }
+
+      setRegisterError(userFriendlyMsg);
       console.error("❌ Full registration error:", {
         message: errorMsg,
         error,
