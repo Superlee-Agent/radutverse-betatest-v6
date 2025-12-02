@@ -453,6 +453,7 @@ export function useIPRegistrationAgent() {
               nftMetadataHash: ipMetadataHash as any,
             },
             allowDuplicates: true,
+            txOptions: { waitForTransaction: true },
           });
         } catch (txError: any) {
           // Check if user rejected the transaction
