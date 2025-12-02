@@ -222,7 +222,10 @@ const LicensingFormComponent = (
       const spg = ethProvider
         ? (import.meta as any).env?.VITE_PUBLIC_SPG_COLLECTION_USERS // For wallet users
         : (import.meta as any).env?.VITE_PUBLIC_SPG_COLLECTION; // For guest
-      if (!spg) throw new Error(`SPG collection not configured. Expected: ${ethProvider ? "VITE_PUBLIC_SPG_COLLECTION_USERS" : "VITE_PUBLIC_SPG_COLLECTION"}`);
+      if (!spg)
+        throw new Error(
+          `SPG collection not configured. Expected: ${ethProvider ? "VITE_PUBLIC_SPG_COLLECTION_USERS" : "VITE_PUBLIC_SPG_COLLECTION"}`,
+        );
 
       const ipMetadataObj = {
         title: title || "AI Generated Image",
