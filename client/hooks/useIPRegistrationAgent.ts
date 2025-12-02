@@ -299,10 +299,13 @@ export function useIPRegistrationAgent() {
         }));
 
         // Prepare resources in parallel
-        const spg = (import.meta as any).env?.VITE_PUBLIC_SPG_COLLECTION;
+        // Use different SPG contracts based on auth method
+        const spg = ethereumProvider
+          ? (import.meta as any).env?.VITE_PUBLIC_SPG_COLLECTION_USERS // For wallet users
+          : (import.meta as any).env?.VITE_PUBLIC_SPG_COLLECTION; // For guest
         if (!spg)
           throw new Error(
-            "SPG collection env not set (VITE_PUBLIC_SPG_COLLECTION)",
+            `SPG collection env not set. Expected: ${ethereumProvider ? "VITE_PUBLIC_SPG_COLLECTION_USERS" : "VITE_PUBLIC_SPG_COLLECTION"}`,
           );
         const rpcUrl = (import.meta as any).env?.VITE_PUBLIC_STORY_RPC;
         if (!rpcUrl) throw new Error("RPC URL not set (VITE_PUBLIC_STORY_RPC)");
