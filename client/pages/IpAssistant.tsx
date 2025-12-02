@@ -23,6 +23,7 @@ import {
   requiresSelfieVerification,
   requiresSubmitReview,
 } from "@/lib/groupLicense";
+import { determineLicenseType } from "@/lib/license/license-types";
 import { ANSWER_DETAILS } from "@/lib/ip-assistant/answer-details";
 import {
   getCurrentTimestamp,
