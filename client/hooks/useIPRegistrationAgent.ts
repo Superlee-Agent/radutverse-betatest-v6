@@ -366,6 +366,22 @@ export function useIPRegistrationAgent() {
                   }
                 }
               } catch {}
+              // Ensure wallet is connected and has accounts
+              try {
+                const accounts = await provider.request({
+                  method: 'eth_accounts'
+                });
+
+                if (!accounts || accounts.length === 0) {
+                  // Request account access if not connected
+                  await provider.request({
+                    method: 'eth_requestAccounts'
+                  });
+                }
+              } catch (accountError: any) {
+                throw new Error(`Failed to connect wallet: ${accountError.message}`);
+              }
+
               const walletClient = createWalletClient({
                 transport: custom(provider),
               });
