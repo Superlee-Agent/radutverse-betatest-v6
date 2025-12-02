@@ -2519,6 +2519,7 @@ const IpAssistant = () => {
                               type="button"
                               onClick={() => {
                                 setSearchResults(searchMsg.results || []);
+                                setOriginalSearchQuery(searchMsg.query);
                                 setShowSearchModal(true);
                               }}
                               className="mt-2 px-3 py-1.5 bg-[#FF4DA6]/20 text-[#FF4DA6] text-xs md:text-sm font-semibold rounded-lg hover:bg-[#FF4DA6]/30 transition-all duration-300"
