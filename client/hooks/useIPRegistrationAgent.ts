@@ -460,8 +460,7 @@ export function useIPRegistrationAgent() {
             allowDuplicates: true,
             txOptions: {
               waitForTransaction: true,
-              confirmations: 1,
-              timeout: 300_000, // 5 minutes for multicall operations
+              pollingInterval: 1000, // Check every 1 second
             },
           });
 
