@@ -339,12 +339,26 @@ const LicensingFormComponent = (
         console.log("✅ Derivative IP asset registered:", childIpId);
         console.log("📋 Metadata URIs:", { ipMetadataUri, nftMetadataUri });
       } catch (registerError: any) {
+        const errorMsg = registerError?.message || String(registerError);
         console.error(
           "❌ Register derivative error:",
-          registerError?.message || registerError,
+          errorMsg,
         );
+
+        // Check if user rejected the transaction
+        if (registerError?.code === 4001 || errorMsg.includes('User rejected')) {
+          throw new Error('Transaction was rejected by the user');
+        }
+        // Check for other common wallet errors
+        if (errorMsg.includes('insufficient funds')) {
+          throw new Error('Insufficient funds for gas and transaction');
+        }
+        if (errorMsg.includes('CallerNotAuthorizedToMint')) {
+          throw new Error('Your wallet is not authorized to mint on this contract');
+        }
+
         throw new Error(
-          `Failed to register derivative IP: ${registerError?.message || String(registerError)}`,
+          `Failed to register derivative IP: ${errorMsg}`,
         );
       }
 
