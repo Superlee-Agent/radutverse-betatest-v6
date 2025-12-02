@@ -218,8 +218,11 @@ const LicensingFormComponent = (
       if (!uploadRes.ok) throw new Error("Failed to upload image to IPFS");
       const { url: imageUri } = await uploadRes.json();
 
-      const spg = (import.meta as any).env?.VITE_PUBLIC_SPG_COLLECTION;
-      if (!spg) throw new Error("SPG collection not configured");
+      // Use different SPG contracts based on auth method
+      const spg = ethProvider
+        ? (import.meta as any).env?.VITE_PUBLIC_SPG_COLLECTION_USERS // For wallet users
+        : (import.meta as any).env?.VITE_PUBLIC_SPG_COLLECTION; // For guest
+      if (!spg) throw new Error(`SPG collection not configured. Expected: ${ethProvider ? "VITE_PUBLIC_SPG_COLLECTION_USERS" : "VITE_PUBLIC_SPG_COLLECTION"}`);
 
       const ipMetadataObj = {
         title: title || "AI Generated Image",
