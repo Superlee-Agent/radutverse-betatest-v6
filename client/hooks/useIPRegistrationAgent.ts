@@ -438,8 +438,9 @@ export function useIPRegistrationAgent() {
 
         setRegisterState((p) => ({ ...p, status: "minting", progress: 75 }));
 
-        const result: any =
-          await story.ipAsset.mintAndRegisterIpAssetWithPilTerms({
+        let result: any;
+        try {
+          result = await story.ipAsset.mintAndRegisterIpAssetWithPilTerms({
             spgNftContract: spg as `0x${string}`,
             recipient: addr as `0x${string}`,
             licenseTermsData,
@@ -451,6 +452,21 @@ export function useIPRegistrationAgent() {
             },
             allowDuplicates: true,
           });
+        } catch (txError: any) {
+          // Check if user rejected the transaction
+          if (txError?.code === 4001 || txError?.message?.includes('User rejected')) {
+            throw new Error('Transaction was rejected by the user');
+          }
+          // Check for other common wallet errors
+          if (txError?.message?.includes('insufficient funds')) {
+            throw new Error('Insufficient funds for gas and transaction');
+          }
+          if (txError?.message?.includes('network')) {
+            throw new Error('Network error. Please check your connection and try again');
+          }
+          // Re-throw with original error if not a known case
+          throw txError;
+        }
 
         setRegisterState({
           status: "success",
