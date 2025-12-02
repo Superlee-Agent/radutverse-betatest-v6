@@ -442,6 +442,11 @@ export function useIPRegistrationAgent() {
 
         let result: any;
         try {
+          console.log("Starting mint and register transaction...", {
+            spgNftContract: spg,
+            recipient: addr,
+          });
+
           result = await story.ipAsset.mintAndRegisterIpAssetWithPilTerms({
             spgNftContract: spg as `0x${string}`,
             recipient: addr as `0x${string}`,
@@ -453,8 +458,21 @@ export function useIPRegistrationAgent() {
               nftMetadataHash: ipMetadataHash as any,
             },
             allowDuplicates: true,
+            txOptions: { waitForTransaction: true },
+          });
+
+          console.log("✅ Mint and register transaction completed", {
+            ipId: result?.ipId,
+            txHash: result?.txHash || result?.transactionHash,
+            result,
           });
         } catch (txError: any) {
+          console.error("❌ Mint and register transaction failed:", {
+            message: txError?.message,
+            code: txError?.code,
+            error: txError,
+          });
+
           // Check if user rejected the transaction
           if (
             txError?.code === 4001 ||
