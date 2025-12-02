@@ -159,13 +159,13 @@ const LicensingFormComponent = (
           // Ensure wallet is connected and has accounts
           try {
             const accounts = await ethProvider.request({
-              method: 'eth_accounts'
+              method: "eth_accounts",
             });
 
             if (!accounts || accounts.length === 0) {
               // Request account access if not connected
               await ethProvider.request({
-                method: 'eth_requestAccounts'
+                method: "eth_requestAccounts",
               });
             }
           } catch (accountError: any) {
@@ -340,26 +340,26 @@ const LicensingFormComponent = (
         console.log("📋 Metadata URIs:", { ipMetadataUri, nftMetadataUri });
       } catch (registerError: any) {
         const errorMsg = registerError?.message || String(registerError);
-        console.error(
-          "❌ Register derivative error:",
-          errorMsg,
-        );
+        console.error("❌ Register derivative error:", errorMsg);
 
         // Check if user rejected the transaction
-        if (registerError?.code === 4001 || errorMsg.includes('User rejected')) {
-          throw new Error('Transaction was rejected by the user');
+        if (
+          registerError?.code === 4001 ||
+          errorMsg.includes("User rejected")
+        ) {
+          throw new Error("Transaction was rejected by the user");
         }
         // Check for other common wallet errors
-        if (errorMsg.includes('insufficient funds')) {
-          throw new Error('Insufficient funds for gas and transaction');
+        if (errorMsg.includes("insufficient funds")) {
+          throw new Error("Insufficient funds for gas and transaction");
         }
-        if (errorMsg.includes('CallerNotAuthorizedToMint')) {
-          throw new Error('Your wallet is not authorized to mint on this contract');
+        if (errorMsg.includes("CallerNotAuthorizedToMint")) {
+          throw new Error(
+            "Your wallet is not authorized to mint on this contract",
+          );
         }
 
-        throw new Error(
-          `Failed to register derivative IP: ${errorMsg}`,
-        );
+        throw new Error(`Failed to register derivative IP: ${errorMsg}`);
       }
 
       // ========================================
@@ -416,15 +416,19 @@ const LicensingFormComponent = (
 
       // Provide user-friendly error messages
       let userFriendlyMsg = errorMsg;
-      if (errorMsg.includes('rejected by the user')) {
-        userFriendlyMsg = '❌ You rejected the transaction. Please try again if you want to proceed.';
-      } else if (errorMsg.includes('insufficient funds')) {
-        userFriendlyMsg = '❌ Insufficient funds for gas fees. Please add more IP tokens.';
-      } else if (errorMsg.includes('network')) {
-        userFriendlyMsg = '❌ Network connection error. Please check your connection and try again.';
-      } else if (errorMsg.includes('CallerNotAuthorizedToMint')) {
-        userFriendlyMsg = '❌ Your wallet is not authorized to mint on this contract. Please check with the admin.';
-      } else if (errorMsg.includes('Failed to register')) {
+      if (errorMsg.includes("rejected by the user")) {
+        userFriendlyMsg =
+          "❌ You rejected the transaction. Please try again if you want to proceed.";
+      } else if (errorMsg.includes("insufficient funds")) {
+        userFriendlyMsg =
+          "❌ Insufficient funds for gas fees. Please add more IP tokens.";
+      } else if (errorMsg.includes("network")) {
+        userFriendlyMsg =
+          "❌ Network connection error. Please check your connection and try again.";
+      } else if (errorMsg.includes("CallerNotAuthorizedToMint")) {
+        userFriendlyMsg =
+          "❌ Your wallet is not authorized to mint on this contract. Please check with the admin.";
+      } else if (errorMsg.includes("Failed to register")) {
         userFriendlyMsg = `❌ Registration failed. Please try again. (${errorMsg.substring(0, 50)}...)`;
       }
 

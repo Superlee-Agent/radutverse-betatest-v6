@@ -369,17 +369,19 @@ export function useIPRegistrationAgent() {
               // Ensure wallet is connected and has accounts
               try {
                 const accounts = await provider.request({
-                  method: 'eth_accounts'
+                  method: "eth_accounts",
                 });
 
                 if (!accounts || accounts.length === 0) {
                   // Request account access if not connected
                   await provider.request({
-                    method: 'eth_requestAccounts'
+                    method: "eth_requestAccounts",
                   });
                 }
               } catch (accountError: any) {
-                throw new Error(`Failed to connect wallet: ${accountError.message}`);
+                throw new Error(
+                  `Failed to connect wallet: ${accountError.message}`,
+                );
               }
 
               const walletClient = createWalletClient({
@@ -454,15 +456,20 @@ export function useIPRegistrationAgent() {
           });
         } catch (txError: any) {
           // Check if user rejected the transaction
-          if (txError?.code === 4001 || txError?.message?.includes('User rejected')) {
-            throw new Error('Transaction was rejected by the user');
+          if (
+            txError?.code === 4001 ||
+            txError?.message?.includes("User rejected")
+          ) {
+            throw new Error("Transaction was rejected by the user");
           }
           // Check for other common wallet errors
-          if (txError?.message?.includes('insufficient funds')) {
-            throw new Error('Insufficient funds for gas and transaction');
+          if (txError?.message?.includes("insufficient funds")) {
+            throw new Error("Insufficient funds for gas and transaction");
           }
-          if (txError?.message?.includes('network')) {
-            throw new Error('Network error. Please check your connection and try again');
+          if (txError?.message?.includes("network")) {
+            throw new Error(
+              "Network error. Please check your connection and try again",
+            );
           }
           // Re-throw with original error if not a known case
           throw txError;
@@ -488,14 +495,18 @@ export function useIPRegistrationAgent() {
 
         // Provide user-friendly error messages
         let userFriendlyMsg = errorMsg;
-        if (errorMsg.includes('rejected by the user')) {
-          userFriendlyMsg = '❌ You rejected the transaction. Please try again if you want to proceed.';
-        } else if (errorMsg.includes('insufficient funds')) {
-          userFriendlyMsg = '❌ Insufficient funds for gas fees. Please add more IP tokens.';
-        } else if (errorMsg.includes('network')) {
-          userFriendlyMsg = '❌ Network connection error. Please check your connection and try again.';
-        } else if (errorMsg.includes('CallerNotAuthorizedToMint')) {
-          userFriendlyMsg = '❌ Your wallet is not authorized to mint on this contract. Please check with the admin.';
+        if (errorMsg.includes("rejected by the user")) {
+          userFriendlyMsg =
+            "❌ You rejected the transaction. Please try again if you want to proceed.";
+        } else if (errorMsg.includes("insufficient funds")) {
+          userFriendlyMsg =
+            "❌ Insufficient funds for gas fees. Please add more IP tokens.";
+        } else if (errorMsg.includes("network")) {
+          userFriendlyMsg =
+            "❌ Network connection error. Please check your connection and try again.";
+        } else if (errorMsg.includes("CallerNotAuthorizedToMint")) {
+          userFriendlyMsg =
+            "❌ Your wallet is not authorized to mint on this contract. Please check with the admin.";
         }
 
         console.error("❌ Registration failed:", {
@@ -503,7 +514,11 @@ export function useIPRegistrationAgent() {
           error,
           stack: error?.stack,
         });
-        setRegisterState({ status: "error", progress: 0, error: userFriendlyMsg });
+        setRegisterState({
+          status: "error",
+          progress: 0,
+          error: userFriendlyMsg,
+        });
         return {
           success: false,
           error: userFriendlyMsg,
